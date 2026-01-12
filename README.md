@@ -30,7 +30,7 @@ It includes a **CLI REPL** for direct SQL interaction and a **Flask Web App** to
 
 1.  **Clone the repository**:
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/benweru/pesapal-jdev26-rdbms.git
     cd pesapal-jdev26-rdbms
     ```
 
