@@ -1,4 +1,4 @@
-# BenDB - Custom RDBMS (PesaPal Challenge '26)
+# RDBMS by Benweru - Custom RDBMS (PesaPal Challenge '26)
 
 ## 📌 Overview
 This project is a custom implementation of a **Relational Database Management System (RDBMS)** built from scratch in Python. It demonstrates core Computer Science fundamentals—Data Structures, File I/O, Query Parsing, and Relational Algebra—without relying on external database libraries (like SQLite or SQLAlchemy).
@@ -59,7 +59,7 @@ python src/main.py
 **Example Commands:**
 ```sql
 CREATE TABLE students (id, name)
-INSERT INTO students (id, name) VALUES (1, 'Ben')
+INSERT INTO students (id, name) VALUES (1, 'Allan')
 SELECT * FROM students
 ```
 
