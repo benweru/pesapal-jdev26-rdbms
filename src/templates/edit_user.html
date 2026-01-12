@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Record - BenDB Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-color: #e2e8f0;
+            --accent-color: #3b82f6;
+            --secondary-color: #64748b;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .card-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h2 { font-size: 1.8rem; font-weight: 500; margin-bottom: 0.5rem; }
+        
+        .form-group { margin-bottom: 1.5rem; }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            text-transform: capitalize;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        input[readonly] {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), #2563eb);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover:not(:active) {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        button:hover { transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="card">
+            <div class="card-header">
+                <h2>Edit Record</h2>
+                <p style="color: var(--secondary-color);">Updating table: <strong>{{ table_name }}</strong></p>
+            </div>
+            <form action="/update_row" method="POST">
+                <input type="hidden" name="table_name" value="{{ table_name }}">
+                <input type="hidden" name="original_pk" value="{{ row.values() | list | first }}">
+                
+                {% for key, value in row.items() %}
+                <div class="form-group">
+                    <label for="{{ key }}">{{ key }}</label>
+                    <input type="{{ 'number' if loop.first else 'text' }}" 
+                           id="{{ key }}" 
+                           name="{{ key }}" 
+                           value="{{ value }}" 
+                           {% if loop.first %}readonly{% endif %} 
+                           required>
+                    {% if loop.first %}
+                    <small style="color: #64748b; font-size: 0.8rem;">Primary Key (Cannot be changed)</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                <div class="btn-group">
+                    <a href="/?table={{ table_name }}" class="btn-secondary">Cancel</a>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BenDB Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-color: #e2e8f0;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-weight: 300;
+            color: #94a3b8;
+        }
+
+        /* Table Switcher */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-color);
+            border-color: rgba(59, 130, 246, 0.4);
+            font-weight: 600;
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h2 { font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: 500; }
+
+        /* Form Styling */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group { display: flex; flex-direction: column; }
+        
+        label {
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+            color: #cbd5e1;
+        }
+
+        input {
+            padding: 0.7rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { outline: none; border-color: var(--accent-color); }
+
+        button {
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: var(--text-color);
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .toast {
+            min-width: 250px;
+            padding: 1rem;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .toast.success { background: rgba(16, 185, 129, 0.9); }
+        .toast.error { background: rgba(239, 68, 68, 0.9); }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="toast-container">
+          {% for category, message in messages %}
+            <div class="toast {{ category }}">
+              <span>{{ message }}</span>
+              <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer; margin-left: 10px;">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+        <script>
+            setTimeout(() => {
+                const toasts = document.querySelectorAll('.toast');
+                toasts.forEach(t => {
+                    t.style.opacity = '0';
+                    t.style.transform = 'translateX(100%)';
+                    t.style.transition = 'all 0.5s ease-in';
+                    setTimeout(() => t.remove(), 500);
+                });
+            }, 4000);
+        </script>
+      {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        <header>
+            <h1>BenDB Manager</h1>
+            <p class="subtitle">Custom RDBMS Dashboard</p>
+            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 0.75rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; color: #94a3b8; display: inline-block;">
+                💡 <strong>Tip:</strong> New tables must be created via the CLI command: <code>CREATE TABLE name (col1 type, col2 type)</code>
+            </div>
+        </header>
+
+        <!-- Table Switcher -->
+        <div class="tabs">
+            {% for tbl in tables %}
+                <a href="/?table={{ tbl }}" class="tab {% if tbl == current_table %}active{% endif %}">
+                    {{ tbl }}
+                </a>
+            {% endfor %}
+        </div>
+
+        {% if current_table %}
+            
+            <!-- Add New Row -->
+            {% if columns %}
+            <section class="card">
+                <h2>Add New Record to <em>{{ current_table }}</em></h2>
+                <form action="/add_row" method="POST">
+                    <input type="hidden" name="table_name" value="{{ current_table }}">
+                    <div class="form-grid">
+                        {% for col in columns %}
+                        <div class="form-group">
+                            <label for="{{ col }}">{{ col }}</label>
+                            <input type="text" id="{{ col }}" name="{{ col }}" placeholder="Enter {{ col }}" required>
+                        </div>
+                        {% endfor %}
+                        <div class="form-group">
+                            <button type="submit">Add Record</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+            {% else %}
+            <section class="card">
+                <h2>Table: <em>{{ current_table }}</em></h2>
+                <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+                    <p>This table is empty. Please use the CLI to insert the first row to define the schema.</p>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- List Data -->
+            {% if rows %}
+            <section class="card">
+                <h2>Current Data</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                {% for col in columns %}
+                                <th>{{ col }}</th>
+                                {% endfor %}
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                            <tr>
+                                {% for col in columns %}
+                                <td>{{ row[col] }}</td>
+                                {% endfor %}
+                                <td style="display: flex; gap: 0.5rem; align-items: center;">
+                                    {% set pk = row.values() | list | first %}
+                                    <a href="/edit_row/{{ current_table }}/{{ pk }}" style="
+                                        display: inline-flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        background: rgba(59, 130, 246, 0.2); 
+                                        color: #3b82f6; 
+                                        padding: 0.4rem 0.8rem; 
+                                        font-size: 0.85rem;
+                                        border: 1px solid rgba(59, 130, 246, 0.3);
+                                        border-radius: 6px;
+                                        text-decoration: none;
+                                        min-width: 70px;
+                                        transition: all 0.2s;
+                                    ">Edit</a>
+                                    <form action="/delete_row" method="POST" style="margin: 0;">
+                                        <input type="hidden" name="table_name" value="{{ current_table }}">
+                                        <input type="hidden" name="pk" value="{{ pk }}">
+                                        <button type="submit" style="
+                                            background: rgba(239, 68, 68, 0.2); 
+                                            color: #ef4444; 
+                                            padding: 0.4rem 0.8rem; 
+                                            font-size: 0.85rem;
+                                            border: 1px solid rgba(239, 68, 68, 0.3);
+                                            border-radius: 6px;
+                                            cursor: pointer;
+                                            min-width: 70px;
+                                            transition: all 0.2s;
+                                        " onclick="return confirm('Are you sure?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% endif %}
+
+        {% else %}
+            <div style="text-align: center; margin-top: 4rem;">
+                <h2>No tables found.</h2>
+                <p>Use the CLI to create a table first!</p>
+            </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>
